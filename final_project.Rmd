@@ -1,0 +1,40 @@
+---
+title: "Statistical Inference Project"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1: Simulation Exercise
+## Overview
+
+
+## Simulations
+
+## Sample Mean versus Theoretical Mean
+
+## Sample Variance versus Theoretical Variance
+
+## Distribution
+
+* * *
+
+# Part 2: Basic Inferential Data Analysis
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# fetch libraries
+library(datasets)
+data("ToothGrowth")
+
+```
+
+## Basic Data Summary
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# get dimensions
+
+```
+
+
