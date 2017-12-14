@@ -34,7 +34,29 @@ data("ToothGrowth")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # get dimensions
+dim(ToothGrowth)
+
 
 ```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# overall comparison of supplements w/o control for dosage 
+oj_all <- ToothGrowth[ToothGrowth$supp=="OJ", 1]
+vd_all <- ToothGrowth[ToothGrowth$supp=="VC", 1]
+```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# t-test for difference in means
+t.test(vd_all, oj_all, paired = FALSE)
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+oj_0.5 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==0.5, 1]
+oj_1 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==1, 1]
+oj_2 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==2, 1]
+
+# t-test for difference in means by dosage of OJ
+t.test(oj_0.5, oj_1, paired = FALSE)
+t.test(oj_1, oj_2, paired = FALSE)
+```
