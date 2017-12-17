@@ -72,9 +72,15 @@ In the case of sample variation, the distribution is near Gaussian despite a sli
 
 ## Distribution
 
+
+
 * * *
 
 # Part 2: Basic Inferential Data Analysis
+
+## Overview
+
+In this section of the report, hypothesis testing is conducted on a tooth growth data for under different supplement regiments.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # fetch libraries
@@ -89,27 +95,75 @@ data("ToothGrowth")
 # get dimensions
 dim(ToothGrowth)
 
-
+# table of tooth growth by supplement and dose
+table(ToothGrowth$supp, ToothGrowth$dose)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # overall comparison of supplements w/o control for dosage 
-oj_all <- ToothGrowth[ToothGrowth$supp=="OJ", 1]
-vd_all <- ToothGrowth[ToothGrowth$supp=="VC", 1]
+oj_all <- ToothGrowth[ToothGrowth$supp=="OJ",]
+vd_all <- ToothGrowth[ToothGrowth$supp=="VC",]
+
+plot(oj_all$len, pch=oj_all$dose, col="red", 
+     main="Tooth Growth by Supplement and Dose", 
+     ylab="Tooth Growth",
+     ylim=c(0,40))
+points(vd_all$len, pch=vd_all$dose, col="blue")
+
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-# t-test for difference in means
-t.test(vd_all, oj_all, paired = FALSE)
+# boxplots of distributions of tooth growth by supplement and dose
+
+boxplot(len~dose, data=oj_all, col="red",
+        boxwex=0.4, at=1:3-.25,
+        main="Guinea Pigs' Tooth Growth", 
+        xlab = "Vitamin C Dose (mg)", ylab = "Tooth Length",
+        xlim=c(0.5, 3.5), ylim=c(0,40))
+boxplot(len~dose, data=vd_all, boxwex=0.4, at=1:3+.25, col="blue", add=TRUE)
+legend(0.5, 40, c("Orange Juice", "Ascorbic Acid"), fill=c("red", "blue"))
+
 
 ```
+
+## Inferential Testing
+
+To start, a test is performed to look for a significant difference in mean tooth length by supplement without controlling for dose.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# t-test for difference in means
+overall_test <- t.test(vd_all$len, oj_all$len, paired = FALSE)
+overall_test$p.value
+overall_test
+
+```
+
+The p-value for the difference in overall means (p=`r overall_test$p.value`) is very close to the commonly accepted alpha value for significance 0.05. At the same time, the corresponding confidence interval of 95% includes zero, but only barely. This is at once reason to not reject H_0 and cause for further investigation since the borderline statistics and the exploratory plots suggest that controlling for dosage might yield significant differences.  
+
+So next we'll perform t-tests on the difference in means of the two supplements this time controlling for dose.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 oj_0.5 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==0.5, 1]
 oj_1 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==1, 1]
 oj_2 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==2, 1]
 
-# t-test for difference in means by dosage of OJ
-t.test(oj_0.5, oj_1, paired = FALSE)
-t.test(oj_1, oj_2, paired = FALSE)
+# t-test for difference in means by dose
+dose_0.5 <- t.test(oj_all[oj_all$dose==0.5,]$len, vd_all[vd_all$dose==0.5,]$len,
+                   paired = FALSE)
+
+dose_1.0 <- t.test(oj_all[oj_all$dose==1,]$len, vd_all[vd_all$dose==1,]$len,
+                   paired = FALSE)
+
+dose_2.0 <- t.test(oj_all[oj_all$dose==2,]$len, vd_all[vd_all$dose==2,]$len,
+                   paired = FALSE)
+
+dose_0.5$estimate[[2]]
+dose_2.0
 ```
+
+
+
+
+## Citations
+
+Boxplot ideas from Roger Bivand R documentation
