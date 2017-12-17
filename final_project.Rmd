@@ -91,6 +91,10 @@ data("ToothGrowth")
 
 ## Basic Data Summary
 
+The dataset contains the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dosages of vitamin C (0.5, 1, 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid. The animals were evenly distributed across the six groups created by the intersection of the variables `supplement` and `dose`. `r table(ToothGrowth$dose, ToothGrowth$supp)`
+
+The data read into a tibble object with dimension `r dim(ToothGrowth)[[1]]` by 'r dim(ToothGrowth)[[2]]` for analysis. 
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # get dimensions
 dim(ToothGrowth)
@@ -99,16 +103,21 @@ dim(ToothGrowth)
 table(ToothGrowth$supp, ToothGrowth$dose)
 ```
 
+A scatterplot of the 
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-# overall comparison of supplements w/o control for dosage 
+# subset by supplement
 oj_all <- ToothGrowth[ToothGrowth$supp=="OJ",]
 vd_all <- ToothGrowth[ToothGrowth$supp=="VC",]
 
+# scatterplot of growth by dose by supplement
 plot(oj_all$len, pch=oj_all$dose, col="red", 
      main="Tooth Growth by Supplement and Dose", 
      ylab="Tooth Growth",
      ylim=c(0,40))
 points(vd_all$len, pch=vd_all$dose, col="blue")
+legend(0.5, 40, c("0.5 mg/day", "1.0 mg/day", "2.0 mg/day"), pch=c(0,1,2))
+legend(23, 8, c("Orange Juice", "Ascorbic Acid"), fill="red", "blue")
 
 ```
 
@@ -161,7 +170,7 @@ dose_0.5$estimate[[2]]
 dose_2.0
 ```
 
-
+T-tests comparing the two vitamin C supplement types by similar dose show a significant difference between the mean tooth length between the group receiving orange juice and that receiving ascorbic acid. The difference in means at doses of 2.0 mg was practically non-existent (p=`r dose_2.0$p.value`, x_bar_oj=`r dose_2.0$estimate[[1]]`, x_bar_acid=`r dose_2.0$estimate[[2]]`). 
 
 
 ## Citations
