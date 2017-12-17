@@ -10,12 +10,65 @@ knitr::opts_chunk$set(echo = TRUE)
 # Part 1: Simulation Exercise
 ## Overview
 
+The exponential distribution has a mean of 1/lambda where lambda is the rate of growth parameter for the exponential function. Taking a random sample of 1000 observations from the exponential distribution, the sample parameters (mean and variation) will be compared to the theoritical mean and variation.
+
 
 ## Simulations
 
+To begin with, the random sample is taken using 0.2 as the rate for the exponential function. A sampling of 40 observations is repeated 1000 times and subsequently organized into a 1000x40 matrix for ease of processing. Row-wise calculation of the mean for each 40 observation sampling is completed and then passed to the analysis in the next section of this report.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# simulation variables
+n <- 40  #number of random observations taken per sample
+B <- 1000  #number of samples
+
+# create simulation matrix
+M <- matrix(rexp(n*B, 0.2), B, n)
+
+# get mean of each sample
+M_means <- apply(M, 1, mean)
+```
+
+## Distribution of Random Sample Distributions
 ## Sample Mean versus Theoretical Mean
 
+
+The vector of 1000 means from the previous section are plotted as a histogram. 
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# histogram of means of sampled distributions
+hist(M_means, breaks=30, 
+     main="Frequency of Sample Means", xlab = "Sample Means")
+
+# add vertical lines for sample and theoretical means
+abline(v=mean(M_means), col="blue", lwd=2) # mean of sampled means
+abline(v=1/.2, col="red", lwd=2) # theoretical mean
+```
+
+The distribution is nearly Gaussian in accord with the Central Limit Theorem. Also, the theoretical mean (mu=`r 1/.2`) is nearly identical to the sample mean (mean=`r mean(M_means)`) which is as expected since although the sample distribution has its own distribution it is centered at mu the population mean.
+
 ## Sample Variance versus Theoretical Variance
+
+The sample variance should be centered around what it is estimating, sigma, the population or theoretical variation. First the standard deviation for each 40 observation sample is calculated and collectively assigned to a variable.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# calculate sd of samples
+M_variations <- apply(M, 1, sd)
+```
+
+Just as with the sample mean, the frequencies of the sample variations as measured by standard deviation is plotted. The mean of the sample standard deviations (blue) and the population standard deviation (red) are also plotted as vertical lines.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# histogram of means of sampled distributions
+hist(M_variations, breaks=45, 
+     main="Frequency of Sample Standard Deviations", 
+     xlab = "Sample Standard Deviations")
+
+# add vertical lines for sample and theoretical means
+abline(v=mean(M_variations), col="blue", lwd=2) # mean of sampled means
+abline(v=1/.2, col="red", lwd=2) # theoretical mean
+```
+
+In the case of sample variation, the distribution is near Gaussian despite a slight right skew. The mean of the sample standard deviations (s=`r mean(M_variations)`) is very close as an estimate to the population or theoretical standard deviation (sigma=`r 1/.2`). This makes sense since we know that the distribution of the sample variance (in this case standard deviation) is centered on the parameter that is is estimating (i.e. the population variation).
 
 ## Distribution
 
