@@ -183,10 +183,10 @@ To start, a test is performed to look for a significant difference in mean tooth
 ```{r message=FALSE, warning=FALSE, error=FALSE}
 # t-test for difference in means
 overall_test <- t.test(vd_all$len, oj_all$len, paired = FALSE)
-
+overall_test$conf.int[1:2]
 ```
 
-The p-value for the difference in overall means (p=`r overall_test$p.value`) is very close to the commonly accepted alpha value for significance 0.05. At the same time, the corresponding confidence interval of 95% includes zero, but only barely. This is at once reason to not reject H_0 and cause for further investigation since the borderline statistics and the exploratory plots suggest that controlling for dosage might yield significant differences.  
+The p-value for the difference in overall means (p=`r overall_test$p.value`) is very close to the commonly accepted alpha value for significance 0.05. At the same time, the corresponding confidence interval of 95% includes zero (lower bound=`r round(overall_test$conf.int[1], 3)`, upper bound=`r round(overall_test$conf.int[2], 3)`), but only barely. This is at once reason to not reject H_0 and cause for further investigation since the borderline statistics and the exploratory plots suggest that controlling for dosage might yield significant differences.  
 
 So next we'll perform t-tests on the difference in means of the two supplements this time controlling for dose. Since none of the tests are paired and because the variations for all dose groups compared by supplement are different, we'll keep the parameters `paired` and `var.equal` as both `FALSE`.
 
