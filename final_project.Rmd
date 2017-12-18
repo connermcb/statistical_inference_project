@@ -38,7 +38,7 @@ M_means <- apply(M, 1, mean)
 
 The frequency of means is plotted. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # histogram of means of sampled distributions
 hist(M_means, breaks=30, 
      main="Frequency of Sample Means", xlab = "Sample Means")
@@ -61,7 +61,7 @@ M_variations <- apply(M, 1, sd)
 
 Just as with the sample mean, the frequencies of the sample variations as measured by standard deviation is plotted. The mean of the sample standard deviations (blue) and the population standard deviation (red) are also plotted as vertical lines.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # histogram of means of sampled distributions
 hist(M_variations, breaks=45, 
      main="Frequency of Sample Standard Deviations", 
@@ -88,7 +88,7 @@ variations_sn <- scale(M_variations)
 
 Then we'll plot them along with a density plot for the standard normal distribution.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # histogram of standardized normalized sample means
 hist(means_sn, breaks=30, prob=TRUE, 
      main="Comparison of Sample & Theoretical Distributions",
@@ -103,7 +103,7 @@ The distribution of sample means is a bit right-skewed but is nearly normal.
 
 Let's also check the distribution of sample variation means.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # histogram of standardized normalized sample means
 hist(variations_sn, breaks=30, prob=TRUE, 
      main="Comparison of Sample & Theoretical Distributions",
@@ -140,7 +140,7 @@ The data read into a tibble object with dimension `r dim(ToothGrowth)[[1]]` by `
 
 A scatterplot of tooth length by observation index is plotted. The variables of `supplement` and `dose` are coded using color and shape respectively.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # subset by supplement
 oj_all <- ToothGrowth[ToothGrowth$supp=="OJ",]
 vd_all <- ToothGrowth[ToothGrowth$supp=="VC",]
@@ -158,7 +158,7 @@ legend(23, 8, c("Orange Juice", "Ascorbic Acid"), fill=c("red", "blue"))
 
 The plot shows a clear relationship between `dose` and tooth length. Any relationship between `supplement` and tooth length is not as clear. To explore that relationship further a boxplot is created.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # boxplots of distributions of tooth growth by supplement and dose
 
 boxplot(len~dose, data=oj_all, col="red",
