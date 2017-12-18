@@ -1,6 +1,8 @@
 ---
 title: "Statistical Inference Project"
+author: "by C. McBride"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -21,6 +23,9 @@ This part of the report explores distributions of a large number of random sampl
 To begin with, a value of 0.2 is assigned as the rate for the exponential function. A sampling of 40 observations is repeated 1000 times and subsequently organized into a 1000x40 matrix for ease of processing. Row-wise calculation of the mean for each 40 observation sampling is completed and then passed to the analysis in the next section of this report.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# set seed for reproducible results
+set.seed(7463)
+
 # simulation variables
 n <- 40  #number of random observations taken per sample
 B <- 1000  #number of samples
@@ -38,10 +43,10 @@ M_means <- apply(M, 1, mean)
 
 The frequency of means is plotted. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center', fig.height=3, fig.width=5}
 # histogram of means of sampled distributions
 hist(M_means, breaks=30, 
-     main="Frequency of Sample Means", xlab = "Sample Means")
+     main="Fig. 1: Frequency of Sample Means", xlab = "Sample Means")
 
 # add vertical lines for sample and theoretical means
 abline(v=mean(M_means), col="blue", lwd=2) # mean of sampled means
@@ -61,10 +66,10 @@ M_variations <- apply(M, 1, sd)
 
 Just as with the sample mean, the frequencies of the sample variations as measured by standard deviation is plotted. The mean of the sample standard deviations (blue) and the population standard deviation (red) are also plotted as vertical lines.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center', fig.height=4, fig.width=6}
 # histogram of means of sampled distributions
-hist(M_variations, breaks=45, 
-     main="Frequency of Sample Standard Deviations", 
+hist(M_variations, breaks=30, 
+     main="Fig. 2: Frequency of Sample Standard Deviations", 
      xlab = "Sample Standard Deviations")
 
 # add vertical lines for sample and theoretical means
@@ -89,32 +94,36 @@ variations_sn <- scale(M_variations)
 Then we'll plot them along with a density plot for the standard normal distribution.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
+# set plot parameters for two panel plot
+par(mfrow=c(1, 2), mar=c(5.1, 4.1, 4.1, 0.1))
+
 # histogram of standardized normalized sample means
 hist(means_sn, breaks=30, prob=TRUE, 
-     main="Comparison of Sample & Theoretical Distributions",
-     xlab="Std. Normal Means", ylab="Density")
+     main=NA,
+     xlab="Mean Std. Normal Means", ylab="Density", ylim=c(0,0.5))
 lines(density(means_sn), col="red", lwd=2)
 lines(density(rnorm(100000)), col="purple", lwd=2)
-legend(1.8, 0.39, c("Sample Means", "Std. Normal Approx."), 
-       fill=c("red", "purple"))
-```
 
-The distribution of sample means is a bit right-skewed but is nearly normal.
 
-Let's also check the distribution of sample variation means.
+# reset margins for second plot
+par(mar=c(5.1, 0.1, 4.2, 2.1))
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
 # histogram of standardized normalized sample means
 hist(variations_sn, breaks=30, prob=TRUE, 
-     main="Comparison of Sample & Theoretical Distributions",
-     xlab="Std. Normal Variations", ylab="Density")
+     main=NA,
+     xlab="Mean Std. Normal Variations",ylab=NA, ylim=c(0,0.5), yaxt="n")
 lines(density(means_sn), col="red", lwd=2)
 lines(density(rnorm(100000)), col="purple", lwd=2)
-legend(1.8, 0.39, c("Sample Variations", "Std. Normal Approx."), 
-       fill=c("red", "purple"))
+
+# add common title
+mtext("Fig. 3: Comparison of Sample & Normal Distributions", cex=1.25, adj=1.25)
+
+# add common legend
+legend(.85, 0.48, c("Sample Means", "Std. Normal Approx."), 
+       fill=c("red", "purple"), cex=0.65)
 ```
 
-As with the distribution of sample means, this distribution also proves very close to normal despite some outliers that show some leverage over the density curve.
+The distribution of sample means is a bit right-skewed but is nearly normal. As with the distribution of sample means, this distribution also proves very close to normal despite some outliers that show some leverage over the density curve.
 
 
 * * *
@@ -140,36 +149,37 @@ The data read into a tibble object with dimension `r dim(ToothGrowth)[[1]]` by `
 
 A scatterplot of tooth length by observation index is plotted. The variables of `supplement` and `dose` are coded using color and shape respectively.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center', fig.height=4, fig.width=6}
 # subset by supplement
 oj_all <- ToothGrowth[ToothGrowth$supp=="OJ",]
 vd_all <- ToothGrowth[ToothGrowth$supp=="VC",]
 
 # scatterplot of growth by dose by supplement
 plot(oj_all$len, pch=oj_all$dose, col="red", 
-     main="Tooth Growth by Supplement and Dose", 
+     main="Fig. 4: Tooth Growth by Supplement and Dose", 
      ylab="Tooth Growth",
      ylim=c(0,40))
 points(vd_all$len, pch=vd_all$dose, col="blue")
-legend(0.5, 40, c("0.5 mg/day", "1.0 mg/day", "2.0 mg/day"), pch=c(0,1,2))
-legend(23, 8, c("Orange Juice", "Ascorbic Acid"), fill=c("red", "blue"))
+legend(0.5, 40, c("0.5 mg/day", "1.0 mg/day", "2.0 mg/day"), 
+       pch=c(0,1,2), cex=0.75)
+legend(23, 8, c("Orange Juice", "Ascorbic Acid"), 
+       fill=c("red", "blue"), cex=0.75)
 
 ```
 
 The plot shows a clear relationship between `dose` and tooth length. Any relationship between `supplement` and tooth length is not as clear. To explore that relationship further a boxplot is created.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.align='center', fig.height=4, fig.width=6}
 # boxplots of distributions of tooth growth by supplement and dose
 
 boxplot(len~dose, data=oj_all, col="red",
         boxwex=0.4, at=1:3-.25,
-        main="Guinea Pigs' Tooth Growth", 
+        main="Fig. 5: Guinea Pigs' Tooth Growth", 
         xlab = "Vitamin C Dose (mg)", ylab = "Tooth Length",
         xlim=c(0.5, 3.5), ylim=c(0,40))
 boxplot(len~dose, data=vd_all, boxwex=0.4, at=1:3+.25, col="blue", add=TRUE)
-legend(0.5, 40, c("Orange Juice", "Ascorbic Acid"), fill=c("red", "blue"))
-
-
+legend(0.5, 40, c("Orange Juice", "Ascorbic Acid"), 
+       fill=c("red", "blue"), cex=0.75)
 ```
 
 Here again, the positive relationship between `dose` and tooth length is evident. The boxplot also helps to clarify the relationship between the categorical variable `supplement` and tooth length. For all dose levels except 2.0 mg/day, there appears to be significant difference between tooth length related to orange juice compared to that related to ascorbic acid. In the case of the exception, the 2.0 mg/day dose, the means appear to be nearly identical. 
@@ -205,7 +215,7 @@ dose_2.0 <- t.test(oj_all[oj_all$dose==2,]$len, vd_all[vd_all$dose==2,]$len,
 
 T-tests comparing the two vitamin C supplement types by similar dose show a significant difference between the mean tooth length between the doses of 2.0 mg was practically non-existent (t = `r round(dose_2.0$statistic, 3)`, p = `r dose_2.0$p.value`, $\bar{x}_{oj}$ = `r dose_2.0$estimate[[1]]`, $\bar{x}_{aa}$ = `r dose_2.0$estimate[[2]]`). 
 
-Overall the difference in apparent effect of the two supplements while not controlling for dose is near significant and warranted further inquiry. At lower doses, orange juice showed a significantly stronger correlation to increased tooth growth, but at the highest dose of 2.0mg/day the two associated mean growth values were nearly identical.
+Overall the difference in apparent effect of the two supplements while not controlling for dose is near significant and warranted further inquiry. At lower doses, orange juice showed a significantly stronger correlation to increased tooth growth, but at the highest dose of 2.0mg/day the two associated mean growth values were nearly identical. Since the t-test used compensates for unequal variation, the results assume that the samples are from  normally distributed populations and as representative of those populations are themselves normally distributed. 
 
 
 ## Citations
@@ -213,3 +223,133 @@ Overall the difference in apparent effect of the two supplements while not contr
 Formatting for the boxplot was largely inspired by code by Roger Bivand as shown in the documentation for the boxplot() function.
 
 Information about the dataset was copied from its documentation at help(ToothGrowth).
+
+* * *
+
+# Appendices
+
+## Code Chunks
+
+Code for simulations:
+
+```{r echo=TRUE, eval=FALSE}
+# set seed for reproducible results
+set.seed(7463)
+
+# simulation variables
+n <- 40  #number of random observations taken per sample
+B <- 1000  #number of samples
+
+# create simulation matrix
+M <- matrix(rexp(n*B, 0.2), B, n)
+
+# get mean of each sample
+M_means <- apply(M, 1, mean)
+```
+
+Code for Figure 1:
+
+```{r echo=TRUE, eval=FALSE}
+# histogram of means of sampled distributions
+hist(M_means, breaks=30, 
+     main="Fig. 1: Frequency of Sample Means", xlab = "Sample Means")
+
+# add vertical lines for sample and theoretical means
+abline(v=mean(M_means), col="blue", lwd=2) # mean of sampled means
+abline(v=1/.2, col="red", lwd=2) # theoretical mean
+```
+
+Code for calculation of variances:
+
+```{r echo=TRUE, eval=FALSE}
+# calculate sd of samples
+M_variations <- apply(M, 1, sd)
+```
+
+Code for Figure 2:
+
+```{r echo=TRUE, eval=FALSE}
+# histogram of means of sampled distributions
+hist(M_variations, breaks=30, 
+     main="Fig. 2: Frequency of Sample Standard Deviations", 
+     xlab = "Sample Standard Deviations")
+
+# add vertical lines for sample and theoretical means
+abline(v=mean(M_variations), col="blue", lwd=2) # mean of sampled means
+abline(v=1/.2, col="red", lwd=2) # theoretical mean
+```
+
+Code for standard normalization of data:
+
+```{r echo=TRUE, eval=FALSE}
+# scale sample means and variations for standard normal
+means_sn <- scale(M_means)
+variations_sn <- scale(M_variations)
+```
+
+Code for Figure 3:
+
+```{r echo=TRUE, eval=FALSE}
+# set plot parameters for two panel plot
+par(mfrow=c(1, 2), mar=c(5.1, 4.1, 4.1, 0.1))
+
+# histogram of standardized normalized sample means
+hist(means_sn, breaks=30, prob=TRUE, 
+     main=NA,
+     xlab="Mean Std. Normal Means", ylab="Density", ylim=c(0,0.5))
+lines(density(means_sn), col="red", lwd=2)
+lines(density(rnorm(100000)), col="purple", lwd=2)
+
+
+# reset margins for second plot
+par(mar=c(5.1, 0.1, 4.2, 2.1))
+
+# histogram of standardized normalized sample means
+hist(variations_sn, breaks=30, prob=TRUE, 
+     main=NA,
+     xlab="Mean Std. Normal Variations",ylab=NA, ylim=c(0,0.5), yaxt="n")
+lines(density(means_sn), col="red", lwd=2)
+lines(density(rnorm(100000)), col="purple", lwd=2)
+
+# add common title
+mtext("Fig. 3: Comparison of Sample & Normal Distributions", cex=1.25, adj=1.25)
+
+# add common legend
+legend(.85, 0.48, c("Sample Means", "Std. Normal Approx."), 
+       fill=c("red", "purple"), cex=0.65)
+```
+
+Code for Figure 4:
+
+```{r echo=TRUE, eval=FALSE}
+# subset by supplement
+oj_all <- ToothGrowth[ToothGrowth$supp=="OJ",]
+vd_all <- ToothGrowth[ToothGrowth$supp=="VC",]
+
+# scatterplot of growth by dose by supplement
+plot(oj_all$len, pch=oj_all$dose, col="red", 
+     main="Fig. 4: Tooth Growth by Supplement and Dose", 
+     ylab="Tooth Growth",
+     ylim=c(0,40))
+points(vd_all$len, pch=vd_all$dose, col="blue")
+legend(0.5, 40, c("0.5 mg/day", "1.0 mg/day", "2.0 mg/day"), 
+       pch=c(0,1,2), cex=0.75)
+legend(23, 8, c("Orange Juice", "Ascorbic Acid"), 
+       fill=c("red", "blue"), cex=0.75)
+
+```
+
+Code for Figure 5:
+
+```{r echo=TRUE, eval=FALSE}
+# boxplots of distributions of tooth growth by supplement and dose
+
+boxplot(len~dose, data=oj_all, col="red",
+        boxwex=0.4, at=1:3-.25,
+        main="Fig. 5: Guinea Pigs' Tooth Growth", 
+        xlab = "Vitamin C Dose (mg)", ylab = "Tooth Length",
+        xlim=c(0.5, 3.5), ylim=c(0,40))
+boxplot(len~dose, data=vd_all, boxwex=0.4, at=1:3+.25, col="blue", add=TRUE)
+legend(0.5, 40, c("Orange Juice", "Ascorbic Acid"), 
+       fill=c("red", "blue"), cex=0.75)
+```
