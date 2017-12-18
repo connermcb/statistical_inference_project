@@ -178,15 +178,15 @@ We'll next test the differences in means using t-tests.
 
 ## Inferential Testing
 
-To start, a test is performed to look for a significant difference in mean tooth length by supplement without controlling for dose. Since the subjects for each subgroup are unique, that is the study is not paired, we'll set the `paired` parameter to `FALSE`. Also, because the variations of the two subsets are unequal (sigma_OJ=`r var(subset(ToothGrowth, supp=="OJ")$len)`, sigma_acid=`r var(subset(ToothGrowth, supp=="VC")$len)`), the parameter `var.equal` is set to `FALSE`
+To start, a test is performed to look for a significant difference in mean tooth length by supplement without controlling for dose. Since the subjects for each subgroup are unique, that is the study is not paired, we'll set the `paired` parameter to `FALSE`. Also, because the variations of the two subsets are unequal ($s^2_{oj}$ = `r var(subset(ToothGrowth, supp=="OJ")$len)`, $s^2_{aa}$ = `r var(subset(ToothGrowth, supp=="VC")$len)`), the parameter `var.equal` is set to `FALSE`
 
 ```{r message=FALSE, warning=FALSE, error=FALSE}
 # t-test for difference in means
 overall_test <- t.test(vd_all$len, oj_all$len, paired = FALSE)
-overall_test$conf.int[1:2]
+
 ```
 
-The p-value for the difference in overall means (p=`r overall_test$p.value`) is very close to the commonly accepted alpha value for significance 0.05. At the same time, the corresponding confidence interval of 95% includes zero (lower bound=`r round(overall_test$conf.int[1], 3)`, upper bound=`r round(overall_test$conf.int[2], 3)`), but only barely. This is at once reason to not reject H_0 and cause for further investigation since the borderline statistics and the exploratory plots suggest that controlling for dosage might yield significant differences.  
+The p-value for the difference in overall means (p = `r overall_test$p.value`) is very close to the commonly accepted alpha value for significance 0.05. At the same time, the corresponding confidence interval of 95% includes zero (lower bound = `r round(overall_test$conf.int[1], 3)`, upper bound = `r round(overall_test$conf.int[2], 3)`), but only barely. This is at once reason to not reject $H_0$ and cause for further investigation since the borderline statistics and the exploratory plots suggest that controlling for dosage might yield significant differences.  
 
 So next we'll perform t-tests on the difference in means of the two supplements this time controlling for dose. Since none of the tests are paired and because the variations for all dose groups compared by supplement are different, we'll keep the parameters `paired` and `var.equal` as both `FALSE`.
 
@@ -203,7 +203,7 @@ dose_2.0 <- t.test(oj_all[oj_all$dose==2,]$len, vd_all[vd_all$dose==2,]$len,
 
 ```
 
-T-tests comparing the two vitamin C supplement types by similar dose show a significant difference between the mean tooth length between the group receiving orange juice and that receiving ascorbic acid. The difference in means at doses of 2.0 mg was practically non-existent (p=`r dose_2.0$p.value`, x_bar_oj=`r dose_2.0$estimate[[1]]`, x_bar_acid=`r dose_2.0$estimate[[2]]`). 
+T-tests comparing the two vitamin C supplement types by similar dose show a significant difference between the mean tooth length between the doses of 2.0 mg was practically non-existent (t = `r round(dose_2.0$statistic, 3)`, p = `r dose_2.0$p.value`, $\bar{x}_{oj}$ = `r dose_2.0$estimate[[1]]`, $\bar{x}_{aa}$ = `r dose_2.0$estimate[[2]]`). 
 
 Overall the difference in apparent effect of the two supplements while not controlling for dose is near significant and warranted further inquiry. At lower doses, orange juice showed a significantly stronger correlation to increased tooth growth, but at the highest dose of 2.0mg/day the two associated mean growth values were nearly identical.
 
