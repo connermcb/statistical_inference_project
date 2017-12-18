@@ -1,21 +1,24 @@
 ---
 title: "Statistical Inference Project"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+* * *
 # Part 1: Simulation Exercise
 ## Overview
 
-The exponential distribution has a mean of 1/lambda where lambda is the rate of growth parameter for the exponential function. Taking a random sample of 1000 observations from the exponential distribution, the sample parameters (mean and variation) will be compared to the theoritical mean and variation.
+This part of the report explores distributions of a large number of random samples from the exponential distribution. The exponential distribution has a mean of 1/lambda where lambda is the rate of growth for the exponential function. The mean and variation of the samples will be compared to the population or theoretical mean and variation.
 
 
 ## Simulations
 
-To begin with, the random sample is taken using 0.2 as the rate for the exponential function. A sampling of 40 observations is repeated 1000 times and subsequently organized into a 1000x40 matrix for ease of processing. Row-wise calculation of the mean for each 40 observation sampling is completed and then passed to the analysis in the next section of this report.
+To begin with, a value of 0.2 is assigned as the rate for the exponential function. A sampling of 40 observations is repeated 1000 times and subsequently organized into a 1000x40 matrix for ease of processing. Row-wise calculation of the mean for each 40 observation sampling is completed and then passed to the analysis in the next section of this report.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # simulation variables
@@ -30,10 +33,11 @@ M_means <- apply(M, 1, mean)
 ```
 
 ## Distribution of Random Sample Distributions
-## Sample Mean versus Theoretical Mean
+### Sample Mean vs Theoretical Mean
 
 
-The vector of 1000 means from the previous section are plotted as a histogram. 
+The frequency of means is plotted. 
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # histogram of means of sampled distributions
 hist(M_means, breaks=30, 
@@ -44,11 +48,11 @@ abline(v=mean(M_means), col="blue", lwd=2) # mean of sampled means
 abline(v=1/.2, col="red", lwd=2) # theoretical mean
 ```
 
-The distribution is nearly Gaussian in accord with the Central Limit Theorem. Also, the theoretical mean (mu=`r 1/.2`) is nearly identical to the sample mean (mean=`r mean(M_means)`) which is as expected since although the sample distribution has its own distribution it is centered at mu the population mean.
+The distribution is nearly Gaussian in accord with the Central Limit Theorem. Also, the theoretical mean (mu=`r 1/.2`) is nearly identical to the sample mean (mean=`r round(mean(M_means),3)`) which is as expected since although the sample distribution has its own distribution it is centered at mu the population mean.
 
-## Sample Variance versus Theoretical Variance
+### Sample Variance vs Theoretical Variance
 
-The sample variance should be centered around what it is estimating, sigma, the population or theoretical variation. First the standard deviation for each 40 observation sample is calculated and collectively assigned to a variable.
+First the standard deviation for each 40 observation sample is calculated and collectively assigned to a variable.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # calculate sd of samples
@@ -68,10 +72,49 @@ abline(v=mean(M_variations), col="blue", lwd=2) # mean of sampled means
 abline(v=1/.2, col="red", lwd=2) # theoretical mean
 ```
 
-In the case of sample variation, the distribution is near Gaussian despite a slight right skew. The mean of the sample standard deviations (s=`r mean(M_variations)`) is very close as an estimate to the population or theoretical standard deviation (sigma=`r 1/.2`). This makes sense since we know that the distribution of the sample variance (in this case standard deviation) is centered on the parameter that is is estimating (i.e. the population variation).
+In the case of sample variation, the distribution is near Gaussian despite a slight right skew. The mean of the sample standard deviations (s=`r round(mean(M_variations))`) is very close as an estimate to the population or theoretical standard deviation (sigma=`r 1/.2`). This makes sense since we know that the distribution of the sample variance (in this case standard deviation) is centered on the parameter that is is estimating (i.e. the population variation).
 
 ## Distribution
 
+Next, we'll show that the two distributions that we found, one for the sample means and the other for the sample variations, are both near normal in their distributions.
+
+First we'll scale each of the vectors to be standard normal.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# scale sample means and variations for standard normal
+means_sn <- scale(M_means)
+variations_sn <- scale(M_variations)
+```
+
+Then we'll plot them along with a density plot for the standard normal distribution.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# histogram of standardized normalized sample means
+hist(means_sn, breaks=30, prob=TRUE, 
+     main="Comparison of Sample & Theoretical Distributions",
+     xlab="Std. Normal Means", ylab="Density")
+lines(density(means_sn), col="red", lwd=2)
+lines(density(rnorm(100000)), col="purple", lwd=2)
+legend(1.8, 0.39, c("Sample Means", "Std. Normal Approx."), 
+       fill=c("red", "purple"))
+```
+
+The distribution of sample means is a bit right-skewed but is nearly normal.
+
+Let's also check the distribution of sample variation means.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# histogram of standardized normalized sample means
+hist(variations_sn, breaks=30, prob=TRUE, 
+     main="Comparison of Sample & Theoretical Distributions",
+     xlab="Std. Normal Variations", ylab="Density")
+lines(density(means_sn), col="red", lwd=2)
+lines(density(rnorm(100000)), col="purple", lwd=2)
+legend(1.8, 0.39, c("Sample Variations", "Std. Normal Approx."), 
+       fill=c("red", "purple"))
+```
+
+As with the distribution of sample means, this distribution also proves very close to normal despite some outliers that show some leverage over the density curve.
 
 
 * * *
@@ -80,7 +123,7 @@ In the case of sample variation, the distribution is near Gaussian despite a sli
 
 ## Overview
 
-In this section of the report, hypothesis testing is conducted on a tooth growth data for under different supplement regiments.
+In this section of the report, hypothesis testing is conducted using a toy dataset (ToothGrowth) from the datasets package.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # fetch libraries
@@ -91,19 +134,11 @@ data("ToothGrowth")
 
 ## Basic Data Summary
 
-The dataset contains the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dosages of vitamin C (0.5, 1, 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid. The animals were evenly distributed across the six groups created by the intersection of the variables `supplement` and `dose`. `r table(ToothGrowth$dose, ToothGrowth$supp)`
+The dataset contains the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dosages of vitamin C (0.5, 1, 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid. The animals were evenly distributed across the six groups created by the intersection of the variables `supplement` and `dose`. 
 
-The data read into a tibble object with dimension `r dim(ToothGrowth)[[1]]` by 'r dim(ToothGrowth)[[2]]` for analysis. 
+The data read into a tibble object with dimension `r dim(ToothGrowth)[[1]]` by `r dim(ToothGrowth)[[2]]` for analysis. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-# get dimensions
-dim(ToothGrowth)
-
-# table of tooth growth by supplement and dose
-table(ToothGrowth$supp, ToothGrowth$dose)
-```
-
-A scatterplot of the 
+A scatterplot of tooth length by observation index is plotted. The variables of `supplement` and `dose` are coded using color and shape respectively.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # subset by supplement
@@ -117,9 +152,11 @@ plot(oj_all$len, pch=oj_all$dose, col="red",
      ylim=c(0,40))
 points(vd_all$len, pch=vd_all$dose, col="blue")
 legend(0.5, 40, c("0.5 mg/day", "1.0 mg/day", "2.0 mg/day"), pch=c(0,1,2))
-legend(23, 8, c("Orange Juice", "Ascorbic Acid"), fill="red", "blue")
+legend(23, 8, c("Orange Juice", "Ascorbic Acid"), fill=c("red", "blue"))
 
 ```
+
+The plot shows a clear relationship between `dose` and tooth length. Any relationship between `supplement` and tooth length is not as clear. To explore that relationship further a boxplot is created.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 # boxplots of distributions of tooth growth by supplement and dose
@@ -135,27 +172,25 @@ legend(0.5, 40, c("Orange Juice", "Ascorbic Acid"), fill=c("red", "blue"))
 
 ```
 
+Here again, the positive relationship between `dose` and tooth length is evident. The boxplot also helps to clarify the relationship between the categorical variable `supplement` and tooth length. For all dose levels except 2.0 mg/day, there appears to be significant difference between tooth length related to orange juice compared to that related to ascorbic acid. In the case of the exception, the 2.0 mg/day dose, the means appear to be nearly identical. 
+
+We'll next test the differences in means using t-tests.
+
 ## Inferential Testing
 
-To start, a test is performed to look for a significant difference in mean tooth length by supplement without controlling for dose.
+To start, a test is performed to look for a significant difference in mean tooth length by supplement without controlling for dose. Since the subjects for each subgroup are unique, that is the study is not paired, we'll set the `paired` parameter to `FALSE`. Also, because the variations of the two subsets are unequal (sigma_OJ=`r var(subset(ToothGrowth, supp=="OJ")$len)`, sigma_acid=`r var(subset(ToothGrowth, supp=="VC")$len)`), the parameter `var.equal` is set to `FALSE`
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r message=FALSE, warning=FALSE, error=FALSE}
 # t-test for difference in means
 overall_test <- t.test(vd_all$len, oj_all$len, paired = FALSE)
-overall_test$p.value
-overall_test
 
 ```
 
 The p-value for the difference in overall means (p=`r overall_test$p.value`) is very close to the commonly accepted alpha value for significance 0.05. At the same time, the corresponding confidence interval of 95% includes zero, but only barely. This is at once reason to not reject H_0 and cause for further investigation since the borderline statistics and the exploratory plots suggest that controlling for dosage might yield significant differences.  
 
-So next we'll perform t-tests on the difference in means of the two supplements this time controlling for dose.
+So next we'll perform t-tests on the difference in means of the two supplements this time controlling for dose. Since none of the tests are paired and because the variations for all dose groups compared by supplement are different, we'll keep the parameters `paired` and `var.equal` as both `FALSE`.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-oj_0.5 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==0.5, 1]
-oj_1 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==1, 1]
-oj_2 <- ToothGrowth[ToothGrowth$supp=="OJ" & ToothGrowth$dose==2, 1]
-
+```{r message=FALSE, warning=FALSE, error=FALSE}
 # t-test for difference in means by dose
 dose_0.5 <- t.test(oj_all[oj_all$dose==0.5,]$len, vd_all[vd_all$dose==0.5,]$len,
                    paired = FALSE)
@@ -166,13 +201,15 @@ dose_1.0 <- t.test(oj_all[oj_all$dose==1,]$len, vd_all[vd_all$dose==1,]$len,
 dose_2.0 <- t.test(oj_all[oj_all$dose==2,]$len, vd_all[vd_all$dose==2,]$len,
                    paired = FALSE)
 
-dose_0.5$estimate[[2]]
-dose_2.0
 ```
 
 T-tests comparing the two vitamin C supplement types by similar dose show a significant difference between the mean tooth length between the group receiving orange juice and that receiving ascorbic acid. The difference in means at doses of 2.0 mg was practically non-existent (p=`r dose_2.0$p.value`, x_bar_oj=`r dose_2.0$estimate[[1]]`, x_bar_acid=`r dose_2.0$estimate[[2]]`). 
 
+Overall the difference in apparent effect of the two supplements while not controlling for dose is near significant and warranted further inquiry. At lower doses, orange juice showed a significantly stronger correlation to increased tooth growth, but at the highest dose of 2.0mg/day the two associated mean growth values were nearly identical.
+
 
 ## Citations
 
-Boxplot ideas from Roger Bivand R documentation
+Formatting for the boxplot was largely inspired by code by Roger Bivand as shown in the documentation for the boxplot() function.
+
+Information about the dataset was copied from its documentation at help(ToothGrowth).
